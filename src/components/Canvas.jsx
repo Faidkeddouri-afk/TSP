@@ -22,6 +22,7 @@ export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunni
     cityIdle:     theme === 'light' ? '#c8eef2' : '#004a55',
     cityIdleAnim: theme === 'light' ? '#c8eef2;#7dd8e0;#c8eef2' : '#004a55;#00a0b0;#004a55',
     vignette:     theme === 'light' ? 'rgba(200,210,220,0.3)' : 'rgba(0,0,0,0.6)',
+    scanline:     theme === 'light' ? 'rgba(0,0,0,0.035)' : 'rgba(0,0,0,0.04)',
   };
   const svgRef = useRef(null);
 
@@ -205,7 +206,7 @@ export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunni
 
       {/* Scanline overlay */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)',
+        background: `repeating-linear-gradient(0deg, transparent, transparent 2px, ${tc.scanline} 2px, ${tc.scanline} 4px)`,
         zIndex: 10,
       }} />
     </div>
