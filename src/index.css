@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fallback tokens — ensures dark-theme defaults before JS sets data-theme */
+:root {
+  --bg-app: #07070f;
+  --bg-sidebar: rgba(8,8,17,0.98);
+  --bg-card: rgba(11,11,20,0.9);
+  --border-cyan: rgba(0,245,255,0.1);
+  --accent-cyan: #00f5ff;
+  --text-dim: rgba(255,255,255,0.4);
+  --text-label: rgba(0,245,255,0.5);
+  --grid-line: rgba(0,245,255,0.025);
+  --border-divider: rgba(255,255,255,0.05);
+  --bg-subtle: rgba(255,255,255,0.05);
+}
+
 /* ────────── Theme tokens ────────── */
 [data-theme="dark"] {
   --bg-app: #07070f;
@@ -182,6 +196,6 @@ html { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
 /* ────────── Recharts overrides ────────── */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: rgba(0, 245, 255, 0.05);
+  stroke: var(--grid-line);
 }
 .recharts-tooltip-wrapper { outline: none; }
