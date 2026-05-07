@@ -135,10 +135,8 @@ export default function App() {
           <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--text-dim)' }}>TRAVELLING SALESMAN PROBLEM</p>
           <div className="mt-1 flex flex-col gap-0.5">
             <span className="text-xs font-mono font-bold" style={{ color: '#ffffff' }}>SAADI Sofiane</span>
-            <div className="flex gap-3">
-              <span className="text-xs font-mono font-bold" style={{ color: '#ffffff' }}>NETTAH Douaa</span>
-              <span className="text-xs font-mono font-bold" style={{ color: '#ffffff' }}>HAMMOUCHE Djamila Roza</span>
-            </div>
+            <span className="text-xs font-mono font-bold" style={{ color: '#ffffff' }}>NETTAH Douaa</span>
+            <span className="text-xs font-mono font-bold" style={{ color: '#ffffff' }}>HAMMOUCHE Djamila Roza</span>
           </div>
         </div>
 
