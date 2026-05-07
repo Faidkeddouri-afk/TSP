@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
 
 const ALGORITHMS = [
-  { id: 'nearestNeighbor', label: 'NEAREST\nNEIGHBOR', short: 'NN', color: '#00f5ff' },
-  { id: 'twoOpt',          label: '2-OPT\nLOCAL',    short: '2OPT', color: '#00ff88' },
+  { id: 'nearestNeighbor',    label: 'NEAREST\nNEIGHBOR',  short: 'NN',  color: '#00f5ff' },
+  { id: 'twoOpt',             label: '2-OPT\nLOCAL',       short: '2OPT', color: '#00ff88' },
   { id: 'simulatedAnnealing', label: 'SIMULATED\nANNEALING', short: 'SA', color: '#ffb700' },
-  { id: 'genetic',         label: 'GENETIC\nALGORITHM', short: 'GA', color: '#bd00ff' },
-  { id: 'bruteForce',      label: 'BRUTE\nFORCE',    short: 'BF', color: '#ff3366' },
+  { id: 'genetic',            label: 'GENETIC\nALGORITHM', short: 'GA',  color: '#bd00ff' },
+  { id: 'bruteForce',         label: 'BRUTE\nFORCE',       short: 'BF',  color: '#ff3366' },
+  { id: 'branchAndBound',     label: 'BRANCH\n& BOUND',    short: 'B&B', color: '#ff8c00' },
 ];
 
 const CITY_PRESETS = [8, 12, 16, 20];
@@ -37,7 +38,7 @@ export default function ControlPanel({ solver }) {
       {/* Algorithm selector */}
       <div>
         <div className="label-text mb-2">ALGORITHM SELECT</div>
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-3 gap-1">
           {ALGORITHMS.map(a => (
             <button
               key={a.id}
@@ -59,6 +60,11 @@ export default function ControlPanel({ solver }) {
         {algorithm === 'bruteForce' && (
           <div className="mt-2 text-xs text-red-400 font-mono">
             ⚠ BRUTE FORCE: MAX 10 CITIES — EXPONENTIAL TIME
+          </div>
+        )}
+        {algorithm === 'branchAndBound' && (
+          <div className="mt-2 text-xs font-mono" style={{ color: '#ff8c00' }}>
+            ⚠ BRANCH &amp; BOUND: MAX 12 CITIES — EXACT OPTIMAL
           </div>
         )}
       </div>
@@ -148,6 +154,9 @@ export default function ControlPanel({ solver }) {
           {cities.length} / 20
           {algorithm === 'bruteForce' && cities.length > 10 && (
             <span className="text-red-400 ml-2">EXCEEDS BF LIMIT</span>
+          )}
+          {algorithm === 'branchAndBound' && cities.length > 12 && (
+            <span className="text-red-400 ml-2">EXCEEDS B&B LIMIT</span>
           )}
         </span>
       </div>

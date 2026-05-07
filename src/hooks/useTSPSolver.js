@@ -4,6 +4,7 @@ import { twoOptSolver } from '../algorithms/twoOpt.js';
 import { simulatedAnnealingSolver } from '../algorithms/simulatedAnnealing.js';
 import { geneticSolver } from '../algorithms/genetic.js';
 import { bruteForceSolver } from '../algorithms/bruteForce.js';
+import { branchAndBoundSolver } from '../algorithms/branchAndBound.js';
 import { tourDistance } from '../algorithms/utils.js';
 
 const ALGORITHM_MAP = {
@@ -12,6 +13,7 @@ const ALGORITHM_MAP = {
   simulatedAnnealing: simulatedAnnealingSolver,
   genetic: geneticSolver,
   bruteForce: bruteForceSolver,
+  branchAndBound: branchAndBoundSolver,
 };
 
 const SPEED_CONFIG = {
@@ -129,6 +131,11 @@ export function useTSPSolver() {
       showToast('Brute force: max 10 cities', 'error');
       return;
     }
+    if (algorithmRef.current === 'branchAndBound' && cities.length > 12) {
+      addLog('ERROR: Branch & Bound limited to 12 cities max', 'error');
+      showToast('Branch & Bound: max 12 cities', 'error');
+      return;
+    }
 
     stopInterval();
     genRef.current = ALGORITHM_MAP[algorithmRef.current](cities);
@@ -226,6 +233,10 @@ export function useTSPSolver() {
     addLog(`ALGORITHM — switched to ${algo}`, 'system');
   }, [addLog]);
 
+  const clearComparison = useCallback(() => {
+    setComparisonResults(null);
+  }, []);
+
   const runComparison = useCallback(() => {
     if (cities.length < 2 || isRunningRef.current) return;
     setIsComparing(true);
@@ -234,9 +245,10 @@ export function useTSPSolver() {
     setTimeout(() => {
       const results = {};
       for (const [name, solverFn] of Object.entries(ALGORITHM_MAP)) {
-        if (name === 'bruteForce' && cities.length > 10) {
+        const cityLimit = name === 'bruteForce' ? 10 : name === 'branchAndBound' ? 12 : Infinity;
+        if (cities.length > cityLimit) {
           results[name] = { distance: null, time: null, skipped: true, tour: [] };
-          addLog(`  ${name}: SKIPPED (${cities.length} cities > 10)`, 'warn');
+          addLog(`  ${name}: SKIPPED (${cities.length} cities > ${cityLimit})`, 'warn');
           continue;
         }
         const t0 = Date.now();
@@ -260,6 +272,6 @@ export function useTSPSolver() {
     cities, algorithm, speed, isRunning, isPaused, solverState,
     logs, comparisonResults, isComparing, toast,
     addCity, clearCities, generateRandom,
-    setAlgorithm, setSpeed, start, pause, resume, reset, runComparison,
+    setAlgorithm, setSpeed, start, pause, resume, reset, runComparison, clearComparison,
   };
 }

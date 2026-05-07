@@ -133,6 +133,9 @@ export default function App() {
             TSP VISUALIZER
           </h1>
           <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--text-dim)' }}>TRAVELLING SALESMAN PROBLEM</p>
+          <p className="text-xs font-mono mt-1" style={{ color: 'var(--text-dim)', opacity: 0.6, letterSpacing: '0.03em' }}>
+            SAADI Sofiane · NETTAH Douaa · HAMMOUCHE Djamila Roza
+          </p>
         </div>
 
         {/* Scrollable panel */}
@@ -164,7 +167,7 @@ export default function App() {
 
           <AnimatePresence>
             {(comparisonResults || isComparing) && (
-              <ComparisonTable results={comparisonResults} isComparing={isComparing} onClose={() => {}} />
+              <ComparisonTable results={comparisonResults} isComparing={isComparing} onClose={solver.clearComparison} />
             )}
           </AnimatePresence>
 

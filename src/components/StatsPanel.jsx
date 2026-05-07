@@ -53,6 +53,7 @@ export default function StatsPanel({ state, algorithm }) {
   const {
     distance, iteration, elapsed, phase, temperature, initialTemp,
     distHistory, tempHistory, generation, permutationsChecked, totalPermutations,
+    nodesPruned,
   } = state;
 
   const isDone = phase === 'complete';
@@ -107,10 +108,15 @@ export default function StatsPanel({ state, algorithm }) {
       />
       {permutationsChecked != null && (
         <StatRow
-          label="PERMS CHECKED"
-          value={`${permutationsChecked.toLocaleString()} / ${(totalPermutations ?? 0).toLocaleString()}`}
+          label={algorithm === 'branchAndBound' ? 'NODES EXPLORED' : 'PERMS CHECKED'}
+          value={algorithm === 'branchAndBound'
+            ? permutationsChecked.toLocaleString()
+            : `${permutationsChecked.toLocaleString()} / ${(totalPermutations ?? 0).toLocaleString()}`}
           color="#bd00ff"
         />
+      )}
+      {nodesPruned != null && (
+        <StatRow label="NODES PRUNED" value={nodesPruned.toLocaleString()} color="#ff8c00" />
       )}
 
       {/* Temperature gauge for SA */}

@@ -6,6 +6,7 @@ const ALGO_LABELS = {
   simulatedAnnealing: 'Simulated Annealing',
   genetic: 'Genetic Algorithm',
   bruteForce: 'Brute Force',
+  branchAndBound: 'Branch & Bound',
 };
 
 const ALGO_COLORS = {
@@ -14,6 +15,7 @@ const ALGO_COLORS = {
   simulatedAnnealing: '#ffb700',
   genetic: '#bd00ff',
   bruteForce: '#ff3366',
+  branchAndBound: '#ff8c00',
 };
 
 export default function ComparisonTable({ results, onClose, isComparing }) {

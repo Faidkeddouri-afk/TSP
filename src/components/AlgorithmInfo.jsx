@@ -51,6 +51,16 @@ const INFO = {
     bestFor: 'Verifying other algorithms; tiny instances (≤10 cities)',
     description: 'Enumerates all (n−1)! permutations of cities and returns the minimum distance tour found.',
   },
+  branchAndBound: {
+    name: 'BRANCH & BOUND EXACT',
+    color: '#ff8c00',
+    timeComplexity: 'O(n!) worst / O(n²·2ⁿ) pruned',
+    spaceComplexity: 'O(n²)',
+    pros: ['Guaranteed optimal solution', 'Prunes dominated branches', 'Much faster than brute force'],
+    cons: ['Exponential worst-case', 'Limited to small n', 'Memory intensive'],
+    bestFor: 'Exact optimal solutions on small instances (≤12 cities)',
+    description: 'Explores a DFS search tree of partial tours. Uses an MST lower bound to prune branches that cannot improve the current best, dramatically reducing the search space.',
+  },
 };
 
 export default function AlgorithmInfo({ algorithm }) {
