@@ -5,7 +5,9 @@ import { simulatedAnnealingSolver } from '../algorithms/simulatedAnnealing.js';
 import { geneticSolver } from '../algorithms/genetic.js';
 import { bruteForceSolver } from '../algorithms/bruteForce.js';
 import { branchAndBoundSolver } from '../algorithms/branchAndBound.js';
-import { tourDistance } from '../algorithms/utils.js';
+import { buildCostMatrix, isSymmetric } from '../algorithms/utils.js';
+import { readFileToRows, parseSheetRows } from '../lib/excel.js';
+import { reconcileImport } from '../lib/matrix.js';
 
 const ALGORITHM_MAP = {
   nearestNeighbor: nearestNeighborSolver,
@@ -33,6 +35,7 @@ const INITIAL_STATE = {
 
 export function useTSPSolver() {
   const [cities, setCities] = useState([]);
+  const [customMatrix, setCustomMatrix] = useState(null);
   const [algorithm, setAlgorithmState] = useState('nearestNeighbor');
   const [speed, setSpeed] = useState('medium');
   const [isRunning, setIsRunning] = useState(false);
@@ -137,8 +140,15 @@ export function useTSPSolver() {
       return;
     }
 
+    const matrix = buildCostMatrix(cities, customMatrix);
+    if (algorithmRef.current === 'branchAndBound' && !isSymmetric(matrix)) {
+      addLog('ERROR: Branch & Bound requires symmetric distances', 'error');
+      showToast('B&B needs symmetric distances', 'error');
+      return;
+    }
+
     stopInterval();
-    genRef.current = ALGORITHM_MAP[algorithmRef.current](cities);
+    genRef.current = ALGORITHM_MAP[algorithmRef.current](cities, matrix);
     startTimeRef.current = Date.now();
     prevBestRef.current = Infinity;
 
@@ -147,7 +157,7 @@ export function useTSPSolver() {
     setIsPaused(false);
     isRunningRef.current = true;
     addLog(`INIT — algorithm: ${algorithmRef.current} | cities: ${cities.length}`, 'system');
-  }, [cities, addLog, showToast, stopInterval]);
+  }, [cities, customMatrix, addLog, showToast, stopInterval]);
 
   useEffect(() => {
     if (isRunning) startInterval();
@@ -194,7 +204,11 @@ export function useTSPSolver() {
       if (prev.length >= 20) return prev;
       return [...prev, city];
     });
-  }, []);
+    setCustomMatrix(prev => {
+      if (prev) addLog('custom distances cleared (node set changed)', 'warn');
+      return null;
+    });
+  }, [addLog]);
 
   const clearCities = useCallback(() => {
     if (isRunningRef.current) return;
@@ -203,6 +217,7 @@ export function useTSPSolver() {
     setIsRunning(false);
     setIsPaused(false);
     setCities([]);
+    setCustomMatrix(null);
     setSolverState(INITIAL_STATE);
     setComparisonResults(null);
     addLog('CLEARED', 'system');
@@ -220,10 +235,61 @@ export function useTSPSolver() {
       y: Math.random() * (700 - margin * 2) + margin,
     }));
     setCities(newCities);
+    setCustomMatrix(null);
     setSolverState(INITIAL_STATE);
     setComparisonResults(null);
     addLog(`GENERATED — ${count} random cities`, 'system');
   }, [stopInterval, addLog]);
+
+  const setMatrixCell = useCallback((i, j, value) => {
+    if (isRunningRef.current) return;
+    setCustomMatrix(prev => {
+      const n = cities.length;
+      const next = prev
+        ? prev.map(row => [...row])
+        : Array.from({ length: n }, () => Array(n).fill(null));
+      next[i][j] = value;
+      return next;
+    });
+  }, [cities.length]);
+
+  const resetMatrix = useCallback(() => {
+    if (isRunningRef.current) return;
+    setCustomMatrix(null);
+    addLog('DISTANCES — reset to euclidean', 'system');
+  }, [addLog]);
+
+  const importFromFile = useCallback(async (file) => {
+    if (isRunningRef.current) return;
+    try {
+      const rows = await readFileToRows(file);
+      const parsed = parseSheetRows(rows);
+      const { cities: newCities, customMatrix: m } = reconcileImport(cities, parsed);
+      stopInterval();
+      genRef.current = null;
+      setIsRunning(false);
+      setIsPaused(false);
+      isRunningRef.current = false;
+      setCities(newCities);
+      setCustomMatrix(m);
+      setSolverState(INITIAL_STATE);
+      setComparisonResults(null);
+      const n = parsed.labels.length;
+      addLog(`IMPORTED — ${n} nodes from ${file.name}`, 'system');
+      showToast(`Imported ${n}×${n} distance matrix`, 'success');
+      const missing = m.reduce(
+        (acc, row, i) => acc + row.filter((c, j) => i !== j && c === null).length,
+        0
+      );
+      if (missing > 0) {
+        addLog(`WARNING — ${missing} unspecified pair(s) fall back to euclidean distance`, 'warn');
+        showToast(`${missing} unspecified pair(s) use euclidean fallback`, 'warn');
+      }
+    } catch (e) {
+      addLog(`IMPORT ERROR — ${e.message}`, 'error');
+      showToast(`Import failed: ${e.message}`, 'error');
+    }
+  }, [cities, stopInterval, addLog, showToast]);
 
   const setAlgorithm = useCallback((algo) => {
     if (isRunningRef.current) return;
@@ -243,6 +309,8 @@ export function useTSPSolver() {
     addLog('COMPARISON — running all algorithms...', 'system');
 
     setTimeout(() => {
+      const matrix = buildCostMatrix(cities, customMatrix);
+      const symmetric = isSymmetric(matrix);
       const results = {};
       for (const [name, solverFn] of Object.entries(ALGORITHM_MAP)) {
         const cityLimit = name === 'bruteForce' ? 10 : name === 'branchAndBound' ? 12 : Infinity;
@@ -251,8 +319,13 @@ export function useTSPSolver() {
           addLog(`  ${name}: SKIPPED (${cities.length} cities > ${cityLimit})`, 'warn');
           continue;
         }
+        if (name === 'branchAndBound' && !symmetric) {
+          results[name] = { distance: null, time: null, skipped: true, tour: [] };
+          addLog('  branchAndBound: SKIPPED (asymmetric matrix)', 'warn');
+          continue;
+        }
         const t0 = Date.now();
-        const gen = solverFn([...cities]);
+        const gen = solverFn([...cities], matrix);
         let lastValue = null;
         let r = gen.next();
         while (!r.done) { if (r.value) lastValue = r.value; r = gen.next(); }
@@ -266,12 +339,13 @@ export function useTSPSolver() {
       setIsComparing(false);
       addLog('COMPARISON DONE', 'success');
     }, 10);
-  }, [cities, addLog]);
+  }, [cities, customMatrix, addLog]);
 
   return {
-    cities, algorithm, speed, isRunning, isPaused, solverState,
+    cities, customMatrix, algorithm, speed, isRunning, isPaused, solverState,
     logs, comparisonResults, isComparing, toast,
     addCity, clearCities, generateRandom,
+    setMatrixCell, resetMatrix, importFromFile,
     setAlgorithm, setSpeed, start, pause, resume, reset, runComparison, clearComparison,
   };
 }

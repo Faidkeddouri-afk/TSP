@@ -1,7 +1,6 @@
-import { distance, tourDistance } from './utils.js';
+import { tourCost } from './utils.js';
 
-function buildInitialTour(cities) {
-  const n = cities.length;
+function buildInitialTour(matrix, n) {
   const visited = new Array(n).fill(false);
   const tour = [0];
   visited[0] = true;
@@ -10,7 +9,7 @@ function buildInitialTour(cities) {
     let best = -1, bestD = Infinity;
     for (let i = 0; i < n; i++) {
       if (!visited[i]) {
-        const d = distance(cities[cur], cities[i]);
+        const d = matrix[cur][i];
         if (d < bestD) { bestD = d; best = i; }
       }
     }
@@ -27,11 +26,11 @@ function twoOptSwap(tour, i, k) {
   return t;
 }
 
-export function* twoOptSolver(cities) {
+export function* twoOptSolver(cities, matrix) {
   if (cities.length < 3) return;
   const n = cities.length;
-  let tour = buildInitialTour(cities);
-  let bestDist = tourDistance(cities, tour);
+  let tour = buildInitialTour(matrix, n);
+  let bestDist = tourCost(matrix, tour);
   let iteration = 0;
   let improved = true;
 
@@ -45,7 +44,7 @@ export function* twoOptSolver(cities) {
     for (let i = 0; i < n - 1; i++) {
       for (let k = i + 1; k < n; k++) {
         const newTour = twoOptSwap(tour, i, k);
-        const newDist = tourDistance(cities, newTour);
+        const newDist = tourCost(matrix, newTour);
         iteration++;
 
         if (newDist < bestDist - 0.001) {

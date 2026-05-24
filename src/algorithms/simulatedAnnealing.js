@@ -1,12 +1,12 @@
-import { tourDistance, shuffleArray } from './utils.js';
+import { tourCost, shuffleArray } from './utils.js';
 
-export function* simulatedAnnealingSolver(cities) {
+export function* simulatedAnnealingSolver(cities, matrix) {
   if (cities.length < 2) return;
   const n = cities.length;
 
   let tour = shuffleArray([...Array(n).keys()]);
   let bestTour = [...tour];
-  let bestDist = tourDistance(cities, tour);
+  let bestDist = tourCost(matrix, tour);
   let currentDist = bestDist;
 
   const initialTemp = 5000;
@@ -26,7 +26,7 @@ export function* simulatedAnnealingSolver(cities) {
     let l = a, r = b;
     while (l < r) { [newTour[l], newTour[r]] = [newTour[r], newTour[l]]; l++; r--; }
 
-    const newDist = tourDistance(cities, newTour);
+    const newDist = tourCost(matrix, newTour);
     const delta = newDist - currentDist;
 
     if (delta < 0 || Math.random() < Math.exp(-delta / temp)) {

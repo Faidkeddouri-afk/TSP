@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Canvas from './components/Canvas.jsx';
 import ControlPanel from './components/ControlPanel.jsx';
+import DistanceMatrix from './components/DistanceMatrix.jsx';
 import StatsPanel from './components/StatsPanel.jsx';
 import AlgorithmInfo from './components/AlgorithmInfo.jsx';
 import LogPanel from './components/LogPanel.jsx';
@@ -144,6 +145,7 @@ export default function App() {
         <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3 min-h-0"
           style={{ scrollbarWidth: 'thin', scrollbarColor: 'color-mix(in srgb, var(--accent-cyan) 12%, transparent) transparent' }}>
           <ControlPanel solver={solver} />
+          <DistanceMatrix solver={solver} />
           <StatsPanel state={solverState} algorithm={solver.algorithm} />
           <AlgorithmInfo algorithm={solver.algorithm} />
           <LogPanel logs={solver.logs} />
