@@ -1,4 +1,4 @@
-import { tourDistance } from './utils.js';
+import { tourCost } from './utils.js';
 
 function factorial(n) {
   let r = 1;
@@ -14,7 +14,7 @@ function* permutations(arr) {
   }
 }
 
-export function* bruteForceSolver(cities) {
+export function* bruteForceSolver(cities, matrix) {
   if (cities.length > 10) {
     yield { error: 'Too many cities (max 10 for brute force)', tour: [], distance: Infinity, complete: true };
     return;
@@ -30,7 +30,7 @@ export function* bruteForceSolver(cities) {
 
   for (const perm of permutations(remaining)) {
     const tour = [0, ...perm];
-    const dist = tourDistance(cities, tour);
+    const dist = tourCost(matrix, tour);
     count++;
     let improved = false;
     if (dist < bestDist) { bestDist = dist; bestTour = [...tour]; improved = true; }

@@ -1,4 +1,4 @@
-import { distance, tourDistance } from './utils.js';
+import { tourCost } from './utils.js';
 
 // Prim's MST on a subset of node indices
 function mstCost(nodes, distMatrix) {
@@ -36,7 +36,7 @@ function nearestNeighborTour(n, distMatrix) {
   return tour;
 }
 
-export function* branchAndBoundSolver(cities) {
+export function* branchAndBoundSolver(cities, matrix) {
   const MAX_CITIES = 12;
   if (cities.length > MAX_CITIES) {
     yield { error: `Too many cities (max ${MAX_CITIES} for branch & bound)`, tour: [], distance: Infinity, complete: true };
@@ -46,14 +46,12 @@ export function* branchAndBoundSolver(cities) {
 
   const n = cities.length;
 
-  const dist = Array.from({ length: n }, (_, i) =>
-    Array.from({ length: n }, (_, j) => i === j ? 0 : distance(cities[i], cities[j]))
-  );
+  const dist = matrix;
 
   // Initial upper bound via nearest-neighbor heuristic enables early pruning
   const nnTour = nearestNeighborTour(n, dist);
   let bestTour = nnTour;
-  let bestDist = tourDistance(cities, nnTour);
+  let bestDist = tourCost(matrix, nnTour);
 
   let nodesExplored = 0;
   let nodesPruned = 0;

@@ -1,6 +1,6 @@
-import { tourDistance, shuffleArray } from './utils.js';
+import { tourCost, shuffleArray } from './utils.js';
 
-const fitness = (cities, tour) => 1 / tourDistance(cities, tour);
+const fitness = (matrix, tour) => 1 / tourCost(matrix, tour);
 
 function tournamentSelect(population, fitnesses, k = 5) {
   let best = null, bestFit = -Infinity;
@@ -41,17 +41,17 @@ function mutate(tour, rate = 0.015) {
   return t;
 }
 
-export function* geneticSolver(cities) {
+export function* geneticSolver(cities, matrix) {
   if (cities.length < 2) return;
   const n = cities.length;
   const popSize = Math.max(60, n * 5);
   const maxGenerations = 800;
 
   let population = Array.from({ length: popSize }, () => shuffleArray([...Array(n).keys()]));
-  let fitnesses = population.map(t => fitness(cities, t));
+  let fitnesses = population.map(t => fitness(matrix, t));
   let bestIdx = fitnesses.indexOf(Math.max(...fitnesses));
   let bestTour = [...population[bestIdx]];
-  let bestDist = tourDistance(cities, bestTour);
+  let bestDist = tourCost(matrix, bestTour);
   const distHistory = [{ gen: 0, dist: bestDist }];
 
   for (let gen = 0; gen < maxGenerations; gen++) {
@@ -62,9 +62,9 @@ export function* geneticSolver(cities) {
       next.push(mutate(orderCrossover(p1, p2)));
     }
     population = next;
-    fitnesses = population.map(t => fitness(cities, t));
+    fitnesses = population.map(t => fitness(matrix, t));
     const curBestIdx = fitnesses.indexOf(Math.max(...fitnesses));
-    const curDist = tourDistance(cities, population[curBestIdx]);
+    const curDist = tourCost(matrix, population[curBestIdx]);
     if (curDist < bestDist) {
       bestDist = curDist;
       bestTour = [...population[curBestIdx]];

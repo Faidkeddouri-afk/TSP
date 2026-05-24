@@ -1,6 +1,6 @@
-import { distance, tourDistance } from './utils.js';
+import { tourCost } from './utils.js';
 
-export function* nearestNeighborSolver(cities) {
+export function* nearestNeighborSolver(cities, matrix) {
   if (cities.length < 2) return;
   const n = cities.length;
   const visited = new Array(n).fill(false);
@@ -15,7 +15,7 @@ export function* nearestNeighborSolver(cities) {
 
     for (let i = 0; i < n; i++) {
       if (!visited[i]) {
-        const d = distance(cities[current], cities[i]);
+        const d = matrix[current][i];
         exploredEdges.push([current, i]);
         if (d < nearestDist) {
           nearestDist = d;
@@ -30,7 +30,7 @@ export function* nearestNeighborSolver(cities) {
     yield {
       tour: [...tour],
       bestTour: [...tour],
-      distance: tourDistance(cities, tour),
+      distance: tourCost(matrix, tour),
       exploredEdges: exploredEdges.slice(-Math.min(exploredEdges.length, 30)),
       iteration: tour.length - 1,
       phase: 'building',
@@ -42,7 +42,7 @@ export function* nearestNeighborSolver(cities) {
   yield {
     tour: finalTour,
     bestTour: finalTour,
-    distance: tourDistance(cities, finalTour),
+    distance: tourCost(matrix, finalTour),
     exploredEdges: [],
     iteration: n,
     phase: 'complete',
