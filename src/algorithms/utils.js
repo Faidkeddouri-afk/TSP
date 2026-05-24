@@ -1,15 +1,37 @@
 export const distance = (a, b) =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
-export const tourDistance = (cities, tour) => {
+// Effective N×N cost matrix. A cell is the override value when present,
+// otherwise the Euclidean distance between the two cities. Diagonal is 0.
+export const buildCostMatrix = (cities, override = null) => {
+  const n = cities.length;
+  return Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => {
+      if (i === j) return 0;
+      const o = override?.[i]?.[j];
+      return (o === undefined || o === null) ? distance(cities[i], cities[j]) : o;
+    })
+  );
+};
+
+// Sum of directed edge costs around the closed tour.
+export const tourCost = (matrix, tour) => {
   if (!tour || tour.length < 2) return 0;
   let d = 0;
   for (let i = 0; i < tour.length; i++) {
-    const from = cities[tour[i]];
-    const to = cities[tour[(i + 1) % tour.length]];
-    if (from && to) d += distance(from, to);
+    d += matrix[tour[i]][tour[(i + 1) % tour.length]];
   }
   return d;
+};
+
+export const isSymmetric = (matrix, eps = 1e-9) => {
+  const n = matrix.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (Math.abs(matrix[i][j] - matrix[j][i]) > eps) return false;
+    }
+  }
+  return true;
 };
 
 export const shuffleArray = (arr) => {
