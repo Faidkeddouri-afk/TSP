@@ -277,6 +277,14 @@ export function useTSPSolver() {
       const n = parsed.labels.length;
       addLog(`IMPORTED — ${n} nodes from ${file.name}`, 'system');
       showToast(`Imported ${n}×${n} distance matrix`, 'success');
+      const missing = m.reduce(
+        (acc, row, i) => acc + row.filter((c, j) => i !== j && c === null).length,
+        0
+      );
+      if (missing > 0) {
+        addLog(`WARNING — ${missing} unspecified pair(s) fall back to euclidean distance`, 'warn');
+        showToast(`${missing} unspecified pair(s) use euclidean fallback`, 'warn');
+      }
     } catch (e) {
       addLog(`IMPORT ERROR — ${e.message}`, 'error');
       showToast(`Import failed: ${e.message}`, 'error');
