@@ -14,6 +14,15 @@ export const buildCostMatrix = (cities, override = null) => {
   );
 };
 
+// N×N matrix where cell[i][j] is the Euclidean distance between cities[i]
+// and cities[j], and the diagonal is 0. Used when no custom matrix is set.
+export const buildEuclideanMatrix = (cities) => {
+  const n = cities.length;
+  return Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 0 : distance(cities[i], cities[j])))
+  );
+};
+
 // Sum of directed edge costs around the closed tour.
 export const tourCost = (matrix, tour) => {
   if (!tour || tour.length < 2) return 0;
