@@ -218,7 +218,10 @@ export function useTSPSolver() {
 
   const generateRandom = useCallback((count) => {
     if (isRunningRef.current) return;
-    if (customMatrix) return;
+    if (customMatrix) {
+      addLog('IGNORED — custom matrix active. RESET TO DEFAULT to re-enable RANDOM CITIES.', 'warn');
+      return;
+    }
     stopInterval();
     genRef.current = null;
     setIsRunning(false);
@@ -249,8 +252,7 @@ export function useTSPSolver() {
     setCityLabels(labels);
     setSolverState(INITIAL_STATE);
     setComparisonResults(null);
-    addLog(`APPLIED — custom ${n}×${n} matrix (${algorithmRef.current})`, 'system');
-    showToast(`Custom matrix applied (${n} cities)`, 'success');
+    addLog(`APPLIED — custom ${n}×${n} matrix`, 'system');
 
     // Auto-run, honoring the same algorithm caps as the RUN button.
     const algo = algorithmRef.current;
@@ -264,6 +266,7 @@ export function useTSPSolver() {
       showToast('Branch & Bound: max 12 cities', 'error');
       return;
     }
+    showToast(`Custom matrix applied (${n} cities) — running ${algo}`, 'success');
     genRef.current = ALGORITHM_MAP[algo](newCities, matrix);
     startTimeRef.current = Date.now();
     prevBestRef.current = Infinity;
