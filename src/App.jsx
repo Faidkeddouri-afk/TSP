@@ -71,6 +71,7 @@ export default function App() {
           exploredEdges={solverState.exploredEdges}
           onCityAdd={solver.addCity}
           isRunning={isRunning}
+          customMatrix={solver.customMatrix}
           theme={theme}
         />
 

@@ -16,7 +16,7 @@ function buildPathD(tour, cities, close = true) {
   return d;
 }
 
-export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunning, theme }) {
+export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunning, customMatrix, theme }) {
   const tc = {
     accent:       theme === 'light' ? '#007a85' : '#00f5ff',
     cityIdle:     theme === 'light' ? '#c8eef2' : '#004a55',
@@ -26,8 +26,10 @@ export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunni
   };
   const svgRef = useRef(null);
 
+  const placementDisabled = isRunning || customMatrix != null;
+
   const handleClick = useCallback((e) => {
-    if (isRunning) return;
+    if (placementDisabled) return;
     const svg = svgRef.current;
     if (!svg) return;
     const pt = svg.createSVGPoint();
@@ -36,7 +38,7 @@ export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunni
     const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
     if (svgPt.x < 10 || svgPt.x > W - 10 || svgPt.y < 10 || svgPt.y > H - 10) return;
     onCityAdd({ x: svgPt.x, y: svgPt.y });
-  }, [isRunning, onCityAdd]);
+  }, [placementDisabled, onCityAdd]);
 
   const tourPathD = useMemo(() => buildPathD(tour, cities), [tour, cities]);
   const tourKey = tour?.join(',') ?? '';
@@ -61,7 +63,7 @@ export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunni
         width="100%"
         height="100%"
         onClick={handleClick}
-        style={{ cursor: isRunning ? 'not-allowed' : 'crosshair', display: 'block' }}
+        style={{ cursor: placementDisabled ? 'not-allowed' : 'crosshair', display: 'block' }}
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>

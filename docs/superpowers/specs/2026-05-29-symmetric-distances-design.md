@@ -221,15 +221,18 @@ is read-only, so this is the only way to override the average.)
 ### Template download
 
 `↓ TEMPLATE` button generates a 4×4 skeleton with default labels and `0`s on
-the diagonal, off-diagonal blank:
+the diagonal, off-diagonal pre-filled with 1:
 
 ```
         City1  City2  City3  City4
-City1     0
-City2            0
-City3                   0
-City4                          0
+City1     0      1      1      1
+City2     1      0      1      1
+City3     1      1      0      1
+City4     1      1      1      0
 ```
+
+Off-diagonal cells ship pre-filled with `1` as placeholders, because the strict
+parser rejects blank off-diagonal cells. Users overwrite them with real distances.
 
 Filename: `tsp-distance-template.xlsx`. Generated client-side via
 `XLSX.utils.aoa_to_sheet` + `XLSX.write` to a `Blob`. The component creates
