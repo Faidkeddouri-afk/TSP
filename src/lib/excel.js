@@ -152,24 +152,27 @@ export async function parseDistanceFile(file) {
 
   const labels = colLabels;
   const matrix = Array.from({ length: n }, () => Array(n).fill(0));
+  // First pass: off-diagonal cells (check 6 per spec validation order table)
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
+      if (i === j) continue;
       const raw = body[i][j + 1];
-      if (i === j) {
-        if (isBlank(raw)) { matrix[i][j] = 0; continue; }
-        const num = Number(raw);
-        if (!Number.isFinite(num) || num !== 0) {
-          throw new Error(`Cell (${labels[i]}, ${labels[j]}) on the diagonal must be 0.`);
-        }
-        matrix[i][j] = 0;
-        continue;
-      }
       const num = Number(raw);
       if (isBlank(raw) || !Number.isFinite(num) || num < 0) {
         throw new Error(`Cell (${labels[i]}, ${labels[j]}) is not a non-negative number: "${raw ?? ''}".`);
       }
       matrix[i][j] = num;
     }
+  }
+  // Second pass: diagonal cells (check 7 per spec validation order table)
+  for (let i = 0; i < n; i++) {
+    const raw = body[i][i + 1];
+    if (isBlank(raw)) { matrix[i][i] = 0; continue; }
+    const num = Number(raw);
+    if (!Number.isFinite(num) || num !== 0) {
+      throw new Error(`Cell (${labels[i]}, ${labels[i]}) on the diagonal must be 0.`);
+    }
+    matrix[i][i] = 0;
   }
 
   return { labels, matrix };

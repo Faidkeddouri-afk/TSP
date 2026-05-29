@@ -114,6 +114,23 @@ describe('parseDistanceFile — happy path', () => {
     expect(matrix[0][1]).toBe(10);
     expect(matrix[1][0]).toBe(12);
   });
+
+  it('parses a 5x5 symmetric matrix', async () => {
+    const file = sheetFile([
+      ['',  'A','B','C','D','E'],
+      ['A',  0,  1,  2,  3,  4],
+      ['B',  1,  0,  5,  6,  7],
+      ['C',  2,  5,  0,  8,  9],
+      ['D',  3,  6,  8,  0, 10],
+      ['E',  4,  7,  9, 10,  0],
+    ]);
+    const { labels, matrix } = await parseDistanceFile(file);
+    expect(labels).toEqual(['A','B','C','D','E']);
+    expect(matrix).toHaveLength(5);
+    matrix.forEach((row) => expect(row).toHaveLength(5));
+    expect(matrix[0][4]).toBe(4);
+    expect(matrix[4][0]).toBe(4);
+  });
 });
 
 describe('parseDistanceFile — validation errors', () => {
@@ -205,6 +222,17 @@ describe('parseDistanceFile — validation errors', () => {
       ['C',  9,   8,   0],
     ]);
     await expect(parseDistanceFile(file)).rejects.toThrow(/diagonal/i);
+  });
+
+  it('reports off-diagonal errors before diagonal errors when both are present', async () => {
+    const file = sheetFile([
+      ['',  'A', 'B', 'C'],
+      ['A',  7,  'oops', 9],
+      ['B',  5,   0,     8],
+      ['C',  9,   8,     0],
+    ]);
+    // Off-diagonal "oops" should fire BEFORE the diagonal "7" at (A,A).
+    await expect(parseDistanceFile(file)).rejects.toThrow(/not a non-negative number/i);
   });
 });
 
