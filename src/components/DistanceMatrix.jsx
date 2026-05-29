@@ -83,7 +83,7 @@ export default function DistanceMatrix({ solver }) {
     active ? cellsFromMatrix(customMatrix) : blankCells(5)
   );
   const [labels, setLabels] = useState(() =>
-    active ? cityLabels.map((l) => (l === defaultLabel(0) ? '' : l)) : blankLabels(5)
+    active ? cityLabels.map((l, i) => (l === defaultLabel(i) ? '' : l)) : blankLabels(5)
   );
   const [invalidSet, setInvalidSet] = useState(() => new Set()); // "i,j" keys with invalid input
   const [rawImport, setRawImport] = useState(null);  // pre-symmetrize matrix for "view raw"
