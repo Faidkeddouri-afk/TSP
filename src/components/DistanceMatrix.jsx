@@ -102,6 +102,15 @@ export default function DistanceMatrix({ solver }) {
       setInvalidSet(new Set());
       setDiffs([]);
       setRawImport(null);
+    } else {
+      // Matrix was just cleared (resetMatrix called). Return working state
+      // to the blank default so reopening shows a fresh grid.
+      setWorkingN(5);
+      setCells(blankCells(5));
+      setLabels(blankLabels(5));
+      setInvalidSet(new Set());
+      setDiffs([]);
+      setRawImport(null);
     }
     // Intentionally not depending on cells/labels/etc.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -424,6 +433,8 @@ export default function DistanceMatrix({ solver }) {
               title={
                 canApply
                   ? 'Replace canvas with N circle-arranged nodes and re-run'
+                  : isRunning
+                  ? 'Solver is running'
                   : compiled.invalid
                   ? 'Fix invalid cells'
                   : `${compiled.empty} empty cells`
