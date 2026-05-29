@@ -171,13 +171,13 @@ export default function Canvas({ cities, tour, exploredEdges, onCityAdd, isRunni
                   <animate attributeName="fill" values={tc.cityIdleAnim} dur="2s" begin={`${(i * 0.4) % 2}s`} repeatCount="indefinite" />
                 )}
               </circle>
-              {/* Index label */}
+              {/* Label (custom matrix mode) or index (Euclidean mode) */}
               <text
                 x={city.x + 9} y={city.y - 9}
                 fill={tc.accent} fontSize="10" fontFamily="JetBrains Mono, monospace"
                 opacity="0.9" style={{ userSelect: 'none' }}
               >
-                {i}
+                {city.label ?? i}
               </text>
             </g>
           );
