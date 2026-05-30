@@ -413,7 +413,7 @@ export default function DistanceMatrix({ solver }) {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={isRunning}
-              className="ctrl-btn"
+              className="ctrl-btn accent"
               title="Import a .xlsx/.csv distance matrix"
               style={{ opacity: isRunning ? 0.4 : 1 }}
             >

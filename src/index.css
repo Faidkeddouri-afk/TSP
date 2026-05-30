@@ -137,7 +137,27 @@ html { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
   letter-spacing: 0.1em;
   cursor: pointer;
   transition: all 0.15s ease;
-  border: 1px solid;
+  /* Neutral default — visible on its own, no modifier required. */
+  background: color-mix(in srgb, var(--accent-cyan) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-cyan) 25%, transparent);
+  color: var(--text-bright, var(--accent-cyan));
+}
+.ctrl-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-cyan) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent-cyan) 45%, transparent);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-cyan) 15%, transparent);
+}
+.ctrl-btn.accent {
+  background: color-mix(in srgb, var(--accent-cyan) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent-cyan) 45%, transparent);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-cyan) 18%, transparent);
+}
+.ctrl-btn.accent:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-cyan) 20%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent-cyan) 30%, transparent);
+  transform: translateY(-1px);
 }
 .ctrl-btn.primary {
   background: color-mix(in srgb, var(--accent-cyan) 10%, transparent);
