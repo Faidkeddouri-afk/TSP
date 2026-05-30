@@ -20,10 +20,13 @@ const SPEED_OPTS = [
 
 export default function ControlPanel({ solver }) {
   const {
-    algorithm, speed, isRunning, isPaused, cities,
+    algorithm, speed, isRunning, isPaused, cities, customMatrix,
     setAlgorithm, setSpeed, start, pause, resume, reset,
     clearCities, generateRandom,
   } = solver;
+
+  const matrixActive = customMatrix != null;
+  const lockedTitle = 'Disabled while custom matrix is active — RESET TO DEFAULT to re-enable';
 
   const canStart = cities.length >= 2 && !isRunning;
   const algo = ALGORITHMS.find(a => a.id === algorithm);
@@ -98,9 +101,10 @@ export default function ControlPanel({ solver }) {
             <button
               key={n}
               onClick={() => generateRandom(n)}
-              disabled={isRunning}
+              disabled={isRunning || matrixActive}
               className="city-btn"
-              title={`Generate ${n} random cities`}
+              title={matrixActive ? lockedTitle : `Generate ${n} random cities`}
+              style={{ opacity: matrixActive ? 0.4 : undefined }}
             >
               {n}
             </button>

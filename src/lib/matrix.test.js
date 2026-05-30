@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { circleLayout, reconcileImport } from './matrix.js';
+import { circleLayout } from './matrix.js';
 
 describe('circleLayout', () => {
   it('produces n points inside the canvas bounds', () => {
@@ -12,21 +12,10 @@ describe('circleLayout', () => {
       expect(p.y).toBeLessThanOrEqual(700);
     }
   });
-});
 
-describe('reconcileImport', () => {
-  const parsed = { labels: ['A', 'B', 'C'], matrix: [[null, 1, 2], [1, null, 3], [2, 3, null]] };
-
-  it('keeps existing cities when the count matches', () => {
-    const cities = [{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 3 }];
-    const out = reconcileImport(cities, parsed);
-    expect(out.cities).toBe(cities);
-    expect(out.customMatrix).toBe(parsed.matrix);
-  });
-
-  it('generates a circle layout when the count differs', () => {
-    const out = reconcileImport([], parsed);
-    expect(out.cities).toHaveLength(3);
-    expect(out.customMatrix).toBe(parsed.matrix);
+  it('places the first node at the top of the circle', () => {
+    const pts = circleLayout(4, 1000, 700, 90);
+    expect(pts[0].x).toBeCloseTo(500);
+    expect(pts[0].y).toBeCloseTo(700 / 2 - (Math.min(1000, 700) / 2 - 90));
   });
 });

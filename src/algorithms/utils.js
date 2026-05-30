@@ -1,16 +1,12 @@
 export const distance = (a, b) =>
   Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
-// Effective N×N cost matrix. A cell is the override value when present,
-// otherwise the Euclidean distance between the two cities. Diagonal is 0.
-export const buildCostMatrix = (cities, override = null) => {
+// N×N matrix where cell[i][j] is the Euclidean distance between cities[i]
+// and cities[j], and the diagonal is 0. Used when no custom matrix is set.
+export const buildEuclideanMatrix = (cities) => {
   const n = cities.length;
   return Array.from({ length: n }, (_, i) =>
-    Array.from({ length: n }, (_, j) => {
-      if (i === j) return 0;
-      const o = override?.[i]?.[j];
-      return (o === undefined || o === null) ? distance(cities[i], cities[j]) : o;
-    })
+    Array.from({ length: n }, (_, j) => (i === j ? 0 : distance(cities[i], cities[j])))
   );
 };
 
@@ -22,16 +18,6 @@ export const tourCost = (matrix, tour) => {
     d += matrix[tour[i]][tour[(i + 1) % tour.length]];
   }
   return d;
-};
-
-export const isSymmetric = (matrix, eps = 1e-9) => {
-  const n = matrix.length;
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      if (Math.abs(matrix[i][j] - matrix[j][i]) > eps) return false;
-    }
-  }
-  return true;
 };
 
 export const shuffleArray = (arr) => {
